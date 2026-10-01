@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>منصة التعليم المحلية - شمال الأردن</title>
+  <link rel="stylesheet" href="style.css">
+  <script src="app.js" defer></script>
+</head>
+<body>
+  <header>
+    <h1>مركز التعليم المحلي المستقل</h1>
+    <p>بيئة تعليمية تفاعلية تعمل بدون الحاجة لاتصال بالإنترنت</p>
+  </header>
+  <main class="grid-container" aria-label="موارد التعلم">
+    <section class="card">
+      <h2>منصة كوليبري (Kolibri)</h2>
+      <p>الوصول إلى الدروس والمناهج المصورة والتمارين التفاعلية باللغة العربية.</p>
+      <a href="http://192.168.1.100:8080" class="btn">افتح كوليبري</a>
+    </section>
+    <section class="card">
+      <h2>مختبر البرمجة للمبتدئين</h2>
+      <p>تعلم أساسيات البرمجة باستخدام JavaScript مباشرة داخل المتصفح وبدون إنترنت.</p>
+      <a href="../programming_activities/python_intro.html" class="btn">ابدأ التعلم</a>
+    </section>
+    <section class="card">
+      <h2>المكتبة الرقمية المحلية</h2>
+      <p>كتب تعليمية ومراجع مصورة وأنشطة إثرائية محفوظة محلياً. ستتوفر قريباً.</p>
+      <span class="btn disabled" aria-disabled="true">قريباً</span>
+    </section>
+  </main>
+  <footer>
+    <p>مشروع خدمة التعليم المحلي - شمال الأردن | حالة النظام:
+      <span id="status-indicator" role="status" aria-live="polite" data-state="checking">جارٍ فحص الاتصال المحلي…</span>
+    </p>
+  </footer>
+</body>
+</html>

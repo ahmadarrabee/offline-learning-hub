@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>مختبر البرمجة المستقل - JavaScript</title>
+  <style>
+    * { box-sizing: border-box; }
+    body { font-family: "Segoe UI", Tahoma, sans-serif; padding: 16px; margin: 0; background: #eceff1; line-height: 1.8; }
+    main { max-width: 800px; margin: 0 auto; background: white; padding: 24px; border-radius: 10px; }
+    a { color: #0056b3; }
+    textarea { display: block; width: 100%; min-height: 180px; font: 16px/1.6 monospace; direction: ltr; text-align: left; padding: 12px; resize: vertical; }
+    #output { background: #263238; color: #b2dfdb; padding: 15px; font-family: monospace; min-height: 100px; border-radius: 4px; direction: ltr; text-align: left; white-space: pre-wrap; overflow-wrap: anywhere; }
+    #output.error { color: #ffb4ab; }
+    .controls { display: flex; gap: 12px; margin-block: 16px; flex-wrap: wrap; }
+    button { padding: 10px 20px; background: #0056b3; color: white; border: none; border-radius: 5px; cursor: pointer; font: inherit; }
+    button:disabled { opacity: .55; cursor: not-allowed; }
+    :focus-visible { outline: 3px solid #28a745; outline-offset: 3px; }
+  </style>
+</head>
+<body>
+  <main>
+    <a href="../custom_interface/index.html">العودة إلى مركز التعلم</a>
+    <h1>مختبر JavaScript للمبتدئين</h1>
+    <h2>التمرين الأول: طباعة المخرجات</h2>
+    <p>اكتب كود JavaScript واستخدم <bdi dir="ltr">console.log()</bdi> لعرض النتيجة. جرب المتغيرات والحلقات والجمع.</p>
+    <label for="code-input">الكود:</label>
+    <textarea id="code-input" spellcheck="false" autocapitalize="off" autocomplete="off">console.log("مرحباً بكم في مركز التعليم المحلي!");
+console.log("2 + 3 =", 2 + 3);</textarea>
+    <div class="controls">
+      <button id="run-button" type="button">تشغيل الكود</button>
+      <button id="stop-button" type="button" disabled>إيقاف</button>
+    </div>
+    <p>الحد الأقصى للتشغيل ٣ ثوانٍ. هذا المختبر للتدريب على JavaScript، رغم الاسم التاريخي للملف.</p>
+    <h2>النتيجة (Output):</h2>
+    <pre id="output" role="status" aria-live="polite"></pre>
+  </main>
+  <script>
+    "use strict";
+    const input = document.getElementById("code-input");
+    const output = document.getElementById("output");
+    const runButton = document.getElementById("run-button");
+    const stopButton = document.getElementById("stop-button");
+    let worker = null;
+    let timer = null;
+    let workerUrl = null;
+    let lines = 0;
+
+    function finish() {
+      if (worker) worker.terminate();
+      if (workerUrl) URL.revokeObjectURL(workerUrl);
+      clearTimeout(timer);
+      worker = null;
+      workerUrl = null;
+      runButton.disabled = false;
+      stopButton.disabled = true;
+    }
+
+    function showError(message) {
+      output.classList.add("error");
+      output.textContent += `خطأ: ${message}\n`;
+    }
+
+    function runCode() {
+      finish();
+      output.textContent = "";
+      output.classList.remove("error");
+      lines = 0;
+      // A separate worker keeps loops away from the page and has no DOM access.
+      // It is an educational runner, not a security sandbox for hostile code.
+      const workerSource = `
+        "use strict";
+        const send = self.postMessage.bind(self);
+        let count = 0;
+        function format(value) {
+          if (typeof value === "string") return value.slice(0, 4000);
+          try { return String(JSON.stringify(value) ?? String(value)).slice(0, 4000); }
+          catch { return String(value).slice(0, 4000); }
+        }
+        console.log = (...args) => {
+          if (++count <= 200) send({type: "log", text: args.map(format).join(" ").slice(0, 4000)});
+        };
+        self.onmessage = (event) => {
+          try {
+            new Function(event.data)();
+            send({type: "done"});
+          } catch (error) {
+            send({type: "error", text: String(error.message || error).slice(0, 4000)});
+          }
+        };
+      `;
+      try {
+        workerUrl = URL.createObjectURL(new Blob([workerSource], {type: "text/javascript"}));
+        worker = new Worker(workerUrl);
+        runButton.disabled = true;
+        stopButton.disabled = false;
+        worker.onmessage = ({data}) => {
+          if (!data || typeof data !== "object") return;
+          if (data.type === "log" && lines++ < 200) {
+            // Student output is text: HTML tags never become page elements.
+            output.textContent += String(data.text).slice(0, 4000) + "\n";
+          } else if (data.type === "error") {
+            showError(String(data.text).slice(0, 4000));
+            finish();
+          } else if (data.type === "done") {
+            if (!output.textContent) output.textContent = "تم التشغيل بدون مخرجات. استخدم console.log().";
+            finish();
+          }
+        };
+        worker.onerror = (event) => {
+          event.preventDefault();
+          showError(event.message);
+          finish();
+        };
+        timer = setTimeout(() => {
+          showError("انتهت مهلة التشغيل (٣ ثوانٍ). تحقق من الحلقات.");
+          finish();
+        }, 3000);
+        worker.postMessage(input.value);
+      } catch (error) {
+        showError(error.message);
+        finish();
+      }
+    }
+    runButton.addEventListener("click", runCode);
+    stopButton.addEventListener("click", () => {
+      finish();
+      output.textContent += "تم إيقاف التشغيل.\n";
+    });
+  </script>
+</body>
+</html>
