@@ -6,6 +6,16 @@
 
 An offline-first educational server platform built to deliver Arabic learning resources, digital literacy tools, and introductory programming labs to students in rural villages across Northern Jordan without mobile data or internet dependencies.
 
+## Why I Built This
+
+This project began with my family. My cousins, uncles, and grandparents on both my mother's and father's sides live in Jordan. They come from families of modest means, and access to basic Wi-Fi, digital skills, and online learning opportunities is limited. These challenges extend beyond my relatives to the wider village community.
+
+God has blessed me with access to technology, connectivity, and opportunities to learn. I felt a responsibility to use those blessings to help the people I love and the community they belong to. I took it upon myself to build an offline learning hub that everyone in the village could access, without needing mobile data or an internet connection.
+
+My goal is to give people a place to explore educational resources, build digital confidence, and take their first steps in programming. This hub is my way of sharing what I have been given and helping make those learning opportunities accessible to my family, their neighbors, and the whole village.
+
+— Ahmad Arrabee
+
 ## Key Features
 
 - **Custom Local Portal:** Lightweight, responsive, RTL-optimized Arabic interface accessible over local Wi-Fi. A heartbeat checks the portal server immediately and every 10 seconds.
